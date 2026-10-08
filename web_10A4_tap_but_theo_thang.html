@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>10A4 • Điểm danh dụng cụ & Trực phạt</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e4e8ef;--primary:#2563eb;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--shadow:0 8px 28px #1e293b12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text)}
+header{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:white;padding:22px 18px;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px #1e3a8a33}
+.wrap{max-width:1100px;margin:auto}.title{font-size:24px;font-weight:800}.sub{opacity:.88;margin-top:4px}
+nav{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}button,.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+nav button{background:#ffffff22;color:#fff}nav button.active{background:#fff;color:#1d4ed8}
+main{padding:18px}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:14px;border-radius:14px;background:#f8fafc;border:1px solid var(--line)}.num{font-size:25px;font-weight:850}.label{font-size:13px;color:var(--muted)}
+.controls{display:flex;gap:10px;flex-wrap:wrap}.search{flex:1;min-width:220px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{font-size:13px;color:var(--muted);background:#f8fafc;position:sticky;top:0}
+.badge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:800}.ok{background:#dcfce7;color:#166534}.bad{background:#fee2e2;color:#991b1b}.warn{background:#ffedd5;color:#9a3412}.blue{background:#dbeafe;color:#1d4ed8}
+.checks{display:flex;gap:8px;flex-wrap:wrap}.check{padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-weight:650}.check.on{background:#dcfce7;border-color:#86efac;color:#166534}
+input[type=text],input[type=date],select,textarea{border:1px solid var(--line);border-radius:9px;padding:9px;font:inherit;width:100%}
+.small{font-size:12px;color:var(--muted)}.hidden{display:none}.empty{padding:30px;text-align:center;color:var(--muted)}
+.danger{background:#fee2e2;color:#991b1b}.primary{background:var(--primary);color:#fff}.secondary{background:#eef2ff;color:#3730a3}.green{background:#dcfce7;color:#166534}
+.actions{display:flex;gap:7px;flex-wrap:wrap}.iconbtn{padding:7px 9px}
+.modal{position:fixed;inset:0;background:#0f172a66;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal>div{background:#fff;border-radius:16px;padding:20px;max-width:500px;width:100%}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.title{font-size:20px}th,td{padding:9px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="title">📋 10A4 — Điểm danh & Trực phạt</div>
+  <div class="sub">Quản lý bút • vở • vi phạm • lịch trực phạt</div>
+  <nav>
+    <button id="tabStudents" class="active" onclick="showTab('students')">Dụng cụ</button>
+    <button id="tabViolations" onclick="showTab('violations')">Vi phạm</button>
+  </nav>
+</div></header>
+<main class="wrap">
+<section id="students">
+  <div class="grid" id="stats"></div>
+  <div class="panel">
+    <div class="controls">
+      <input id="studentSearch" class="search" placeholder="🔎 Tìm học sinh..." oninput="renderStudents()">
+      <button class="primary" onclick="markAll(true)">Đánh dấu tất cả đủ</button>
+      <button class="secondary" onclick="exportData()">Xuất dữ liệu</button><button class="green" onclick="createShareFile()">📤 Tạo bản chia sẻ</button>
+      <button class="danger" onclick="resetTools()">Đặt lại bút/vở</button>
+      <button class="green" onclick="addStudent()">➕ Thêm học sinh</button>
+    </div>
+    <div class="controls" style="margin-top:10px">
+      <label style="min-width:170px"><b>📅 Tháng:</b><select id="monthSelect" onchange="changeMonth()"><option value="9">Tháng 9</option><option value="10">Tháng 10</option></select></label>
+      <label style="min-width:220px"><b>📌 Phân loại:</b><select id="statusFilter" onchange="renderStudents()"><option value="all">Tất cả</option><option value="missing">Chưa nộp đủ</option><option value="book">Chưa nộp tập</option><option value="pen">Chưa nộp bút</option><option value="full">Đã nộp đủ</option></select></label>
+    </div>
+    <p class="small">Chọn tháng để theo dõi riêng từng tháng. Bấm các ô thống kê để xem ngay danh sách ai chưa nộp tập hoặc bút.</p>
+  </div>
+  <div class="panel table-wrap"><table><thead><tr><th>STT</th><th>Học sinh</th><th>Bút</th><th>Vở</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead><tbody id="studentRows"></tbody></table></div>
+</section>
+
+
+<section id="violations" class="hidden">
+  <div class="panel">
+    <div class="controls">
+      <input id="vioSearch" class="search" placeholder="🔎 Tìm học sinh / lỗi..." oninput="renderViolations()">
+      <button class="green" onclick="addViolation()">➕ Thêm lỗi vi phạm</button>
+    </div>
+  </div>
+  <div class="panel table-wrap"><table><thead><tr><th>Ngày</th><th>Học sinh</th><th>Hình thức vi phạm</th><th>Điểm HK</th></tr></thead><tbody id="vioRows"></tbody></table></div>
+</section>
+</main>
+
+
+
+<script>
+const BASE = {"students": ["Kim Ngọc Thanh Bích", "Lê Hoàng Duy", "Hàn Tuấn Khang", "Nguyễn Trần Diễm My", "Trương Huỳnh Trúc Như", "Nguyễn Ngọc Minh Quyên", "Nguyễn Nhân Tài", "Võ Tuấn Vũ", "Vũ Hoài Phong", "Ninh Thế Kiệt", "Nguyễn Hoàng Mai Khanh", "Đỗ Hoàng Phi Long", "Nguyễn Ngọc Tú Minh", "Hà Minh Hải Dương", "Trần Thị Minh Giang", "Nguyễn Hoàng Tú Anh", "Đỗ Văn Dương", "Nguyễn Tùng Lâm", "Nguyễn Thiên Phát", "Trần Lê Tuấn Kiệt", "Hoàng Trần Trung Nguyên", "Nguyễn Thanh Huy", "Hoàng Quỳnh Như", "Trần Minh Trí", "Lê Uyên Nhi", "Phan Nguyễn Nhã Thi", "Nguyễn Phùng Nguyên Kiên", "Cao Minh Hải Đăng", "Phù Thu Hà", "Phùng Quang Huy", "Khương Thanh Hà", "Trần Nguyên Khang"], "violations": [{"name": "Kim Ngọc Thanh Bích", "date": "07/09/2026", "form": "Đi trễ buổi chiều", "score": -4.0}, {"name": "Kim Ngọc Thanh Bích", "date": "10/09/2026", "form": "Mang giày không cài quai hậu", "score": null}, {"name": "Lê Hoàng Duy", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -2.0}, {"name": "Hàn Tuấn Khang", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -4.0}, {"name": "Hàn Tuấn Khang", "date": "21/9/2026", "form": "Mất trật tự trong giờ học", "score": null}, {"name": "Hàn Tuấn Khang", "date": "28/9/2026", "form": "Đi trễ buổi sáng", "score": -2.0}, {"name": "Nguyễn Trần Diễm My", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -3.0}, {"name": "Nguyễn Trần Diễm My", "date": "", "form": "Tóc nhuộm", "score": null}, {"name": "Trương Huỳnh Trúc Như", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -6.0}, {"name": "Trương Huỳnh Trúc Như", "date": "10/09/2026", "form": "Đi trễ buổi sáng", "score": null}, {"name": "Trương Huỳnh Trúc Như", "date": "", "form": "Đi trễ buổi sáng", "score": null}, {"name": "Nguyễn Ngọc Minh Quyên", "date": "07/09/2026", "form": "Đi trễ buổi chiều", "score": -4.0}, {"name": "Nguyễn Ngọc Minh Quyên", "date": "10/09/2026", "form": "Mang giày không cài quai hậu", "score": null}, {"name": "Nguyễn Nhân Tài", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -3.0}, {"name": "Nguyễn Nhân Tài", "date": "24/9/2026", "form": "Môn hóa(ghi bài không đầy đủ)", "score": null}, {"name": "Võ Tuấn Vũ", "date": "07/09/2026", "form": "Đi trễ buổi sáng", "score": -3.0}, {"name": "Võ Tuấn Vũ", "date": "24/9/2026", "form": "Môn hóa(ghi bài không đầy đủ)", "score": null}, {"name": "Vũ Hoài Phong", "date": "09/11/2026", "form": "Sử dụng điện thoại", "score": -8.0}, {"name": "Vũ Hoài Phong", "date": "21/9/2026", "form": "Mất trật tự trong giờ học x2", "score": null}, {"name": "Vũ Hoài Phong", "date": "", "form": "Môn KTPL", "score": null}, {"name": "Ninh Thế Kiệt", "date": "11/09/2026", "form": "Đi trễ buổi sáng", "score": -4.0}, {"name": "Ninh Thế Kiệt", "date": "", "form": "Mất trật tự trong giờ học", "score": null}, {"name": "Nguyễn Hoàng Mai Khanh", "date": "09/11/2026", "form": "Nghỉ học có phép sáng (SP)", "score": -3.5}, {"name": "Nguyễn Hoàng Mai Khanh", "date": "12/09/2026", "form": "Nghỉ học có phép sáng (SP)", "score": null}, {"name": "Nguyễn Hoàng Mai Khanh", "date": "26/09/2026", "form": "Đi trễ buổi sáng ", "score": null}, {"name": "Nguyễn Hoàng Mai Khanh", "date": "30/09/2026", "form": "Nghỉ học có phép chiều (SP)", "score": null}, {"name": "Đỗ Hoàng Phi Long", "date": "14/09/2026", "form": "Đi trễ buổi sáng", "score": -2.0}, {"name": "Nguyễn Ngọc Tú Minh", "date": "14/09/2026", "form": "Đi trễ buổi sáng", "score": -4.0}, {"name": "Nguyễn Ngọc Tú Minh", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": null}, {"name": "Nguyễn Ngọc Tú Minh", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": null}, {"name": "Hà Minh Hải Dương", "date": "15/09/2026", "form": "Sử dụng điện thoại", "score": -5.0}, {"name": "Trần Thị Minh Giang", "date": "15/09/2026", "form": "Sử dụng điện thoại", "score": -5.0}, {"name": "Nguyễn Hoàng Tú Anh", "date": "21/09/2026", "form": "Đi trễ buổi sáng", "score": -2.0}, {"name": "Đỗ Văn Dương", "date": "25/09/2026", "form": "Nghỉ học có phép sáng (SP)", "score": -1.5}, {"name": "Đỗ Văn Dương", "date": "", "form": "Môn tin(không hoàn thành yêu cầu)", "score": null}, {"name": "Nguyễn Tùng Lâm", "date": "25/09/2026", "form": "Đi trễ buổi sáng", "score": -6.0}, {"name": "Nguyễn Tùng Lâm", "date": "21/9/2026", "form": "Mất trật tự trong giờ họcx2", "score": null}, {"name": "Nguyễn Thiên Phát", "date": "21/9/2026", "form": "Mất trật tự trong giờ học", "score": -4.0}, {"name": "Nguyễn Thiên Phát", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": null}, {"name": "Trần Lê Tuấn Kiệt", "date": "21/9/2026", "form": "Mất trật tự trong giờ học", "score": -2.0}, {"name": "Hoàng Trần Trung Nguyên", "date": "21/9/2026", "form": "Mất trật tự trong giờ học", "score": -3.0}, {"name": "Hoàng Trần Trung Nguyên", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": null}, {"name": "Nguyễn Thanh Huy", "date": "23/9/2026", "form": "Môn tin (Không tập, không làm việc)", "score": -4.0}, {"name": "Nguyễn Thanh Huy", "date": "", "form": "Nói chuyện riêng trong giờ học", "score": null}, {"name": "Hoàng Quỳnh Như", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Trần Minh Trí", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Lê Uyên Nhi", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Phan Nguyễn Nhã Thi", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Nguyễn Phùng Nguyên Kiên", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Cao Minh Hải Đăng", "date": "23/9/2026", "form": "Môn tin(không hoàn thành yêu cầu)", "score": -1.0}, {"name": "Phù Thu Hà", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": -1.0}, {"name": "Phùng Quang Huy", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": -1.0}, {"name": "Khương Thanh Hà", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": -1.0}, {"name": "Trần Nguyên Khang", "date": "24/9/2026", "form": "Môn hóa(không ôn bài)", "score": -1.0}]};
+// Danh sách có thể chỉnh sửa trực tiếp; dữ liệu được lưu trong localStorage.
+const DATA_KEY='10A4_custom_data_v1';
+const CUSTOM_DATA = JSON.parse(localStorage.getItem(DATA_KEY)||'null');
+if(CUSTOM_DATA){
+  BASE.students = Array.isArray(CUSTOM_DATA.students) ? CUSTOM_DATA.students : BASE.students;
+  BASE.violations = Array.isArray(CUSTOM_DATA.violations) ? CUSTOM_DATA.violations : BASE.violations;
+}
+function saveData(){
+  localStorage.setItem(DATA_KEY, JSON.stringify({
+    students: BASE.students,
+    violations: BASE.violations
+  }));
+}
+const KEY='10A4_diem_danh_v2';
+const EMBEDDED_STATE = null;
+const SAVED_STATE = EMBEDDED_STATE || JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('10A4_diem_danh_v1')||'null');
+let state=SAVED_STATE||{currentMonth:'9',months:{'9':{tools:Object.fromEntries(BASE.students.map(n=>[n,{pen:false,notebook:false,note:''}]))}}};
+if(!state.months){ state={currentMonth:'9',months:{'9':{tools:state.tools||{}}}}; }
+if(!state.currentMonth) state.currentMonth='9';
+if(!state.months['9']) state.months['9']={tools:{}};
+if(!state.months['10']) state.months['10']={tools:{}};
+function ensureMonth(m){
+  if(!state.months[m]) state.months[m]={tools:{}};
+  BASE.students.forEach(n=>{if(!state.months[m].tools[n]) state.months[m].tools[n]={pen:false,notebook:false,note:''};});
+}
+ensureMonth('9'); ensureMonth('10');
+function currentTools(){ensureMonth(state.currentMonth);return state.months[state.currentMonth].tools;}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function setFilter(v){document.getElementById('statusFilter').value=v;renderStudents();}
+function changeMonth(){state.currentMonth=document.getElementById('monthSelect').value;ensureMonth(state.currentMonth);save();renderStudents();}
+function renderStats(){
+ let total=BASE.students.length,full=0,pens=0,books=0;const tools=currentTools();
+ BASE.students.forEach(n=>{let x=tools[n];if(x?.pen)pens++;if(x?.notebook)books++;if(x?.pen&&x?.notebook)full++;});
+ document.getElementById('stats').innerHTML=[
+  ['👥',total,'Tất cả','all'],['📚',total-books,'Chưa nộp tập','book'],['🖊️',total-pens,'Chưa nộp bút','pen'],['⚠️',total-full,'Chưa nộp đủ','missing']
+ ].map(x=>`<button class="stat" style="text-align:left;width:100%" onclick="setFilter('${x[3]}')"><div class="label">${x[0]} ${x[2]}</div><div class="num">${x[1]}</div></button>`).join('');
+}
+function renderStudents(){
+ const q=document.getElementById('studentSearch').value.toLowerCase();const filter=document.getElementById('statusFilter').value;const tools=currentTools();
+ let arr=BASE.students.filter(n=>{const x=tools[n]||{pen:false,notebook:false};if(!n.toLowerCase().includes(q))return false;if(filter==='book')return !x.notebook;if(filter==='pen')return !x.pen;if(filter==='missing')return !(x.pen&&x.notebook);if(filter==='full')return x.pen&&x.notebook;return true;});
+ document.getElementById('studentRows').innerHTML=arr.map(n=>{let x=tools[n]||{pen:false,notebook:false,note:''};let full=x.pen&&x.notebook;return `<tr><td>${BASE.students.indexOf(n)+1}</td><td><b>${esc(n)}</b></td><td><button class="check ${x.pen?'on':''}" onclick="toggleTool('${esc(n)}','pen')">${x.pen?'✓ Đã nộp':'✕ Chưa nộp'}</button></td><td><button class="check ${x.notebook?'on':''}" onclick="toggleTool('${esc(n)}','notebook')">${x.notebook?'✓ Đã nộp':'✕ Chưa nộp'}</button></td><td><span class="badge ${full?'ok':'bad'}">${full?'ĐỦ BÚT + TẬP':'CHƯA ĐỦ'}</span></td><td><input value="${esc(x.note||'')}" placeholder="Ghi chú..." onchange="setNote('${esc(n)}',this.value)"></td></tr>`;}).join('')||`<tr><td colspan="6" class="empty">Không có học sinh thuộc phân loại này</td></tr>`;
+ document.getElementById('monthSelect').value=state.currentMonth;renderStats();
+}
+function toggleTool(n,k){currentTools()[n][k]=!currentTools()[n][k];save();renderStudents();}
+function setNote(n,v){currentTools()[n].note=v;save();}
+function markAll(v){const tools=currentTools();BASE.students.forEach(n=>{tools[n].pen=v;tools[n].notebook=v});save();renderStudents();}
+function resetTools(){if(confirm('Đặt lại toàn bộ trạng thái bút/tập của tháng '+state.currentMonth+'?')){const tools=currentTools();BASE.students.forEach(n=>{tools[n]={pen:false,notebook:false,note:''}});save();renderStudents();}}
+function showTab(t){['students','violations'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==t));document.getElementById('tabStudents').classList.toggle('active',t==='students');document.getElementById('tabViolations').classList.toggle('active',t==='violations');}
+function renderViolations(){let q=document.getElementById('vioSearch').value.toLowerCase();let a=BASE.violations.filter(x=>(x.name+x.form+x.date).toLowerCase().includes(q));document.getElementById('vioRows').innerHTML=a.map(x=>`<tr><td>${esc(x.date)}</td><td><b>${esc(x.name)}</b></td><td>${esc(x.form)}</td><td>${x.score==null?'—':x.score}</td></tr>`).join('')||`<tr><td colspan="4" class="empty">Không có dữ liệu</td></tr>`;}
+
+function addStudent(){
+  const name=prompt('Nhập tên học sinh mới:');
+  if(name===null) return;
+  const n=name.trim().replace(/\s+/g,' ');
+  if(!n) return alert('Vui lòng nhập tên học sinh.');
+  if(BASE.students.some(x=>x.toLowerCase()===n.toLowerCase()))
+    return alert('Tên học sinh này đã có trong danh sách.');
+  BASE.students.push(n);
+  Object.keys(state.months).forEach(m=>{state.months[m].tools[n]={pen:false,notebook:false,note:''};});
+  saveData(); save(); renderStudents();
+  alert('Đã thêm học sinh: '+n);
+}
+function addViolation(){
+  const name=prompt('Tên học sinh:');
+  if(name===null) return;
+  const n=name.trim().replace(/\s+/g,' ');
+  if(!n) return alert('Vui lòng nhập tên học sinh.');
+  if(!BASE.students.some(x=>x.toLowerCase()===n.toLowerCase())){
+    if(confirm('Tên này chưa có trong danh sách học sinh. Thêm luôn vào danh sách bút/vở?')){
+      BASE.students.push(n);
+      Object.keys(state.months).forEach(m=>{state.months[m].tools[n]={pen:false,notebook:false,note:''};});
+    } else return;
+  }
+  const date=prompt('Ngày vi phạm (ví dụ 07/10/2026):','');
+  if(date===null) return;
+  const form=prompt('Lỗi vi phạm:');
+  if(form===null) return;
+  const f=form.trim();
+  if(!f) return alert('Vui lòng nhập lỗi vi phạm.');
+  const scoreText=prompt('Điểm HK (để trống nếu không có):','');
+  if(scoreText===null) return;
+  const s=scoreText.trim();
+  const score=s===''?null:(Number(s.replace(',','.'))||0);
+  BASE.violations.push({name:n,date:date.trim(),form:f,score});
+  saveData(); save(); renderStudents(); renderViolations();
+  alert('Đã thêm lỗi vi phạm.');
+}
+
+function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='10A4_diem_danh_truc_phat.json';a.click();URL.revokeObjectURL(a.href);}
+
+function createShareFile(){
+  saveData();
+  save();
+  const stateJson = JSON.stringify(state).replace(/</g,'\\u003c');
+  const base = document.documentElement.outerHTML;
+  const marker = 'const EMBEDDED_STATE = null;';
+  const baseMarker = "const CUSTOM_DATA = JSON.parse(localStorage.getItem(DATA_KEY)||'null');";
+  let replaced = base.replace(marker, 'const EMBEDDED_STATE = ' + stateJson + ';');
+  const customJson = JSON.stringify({students:BASE.students,violations:BASE.violations}).replace(/</g,'\\u003c');
+  replaced = replaced.replace(baseMarker, 'const CUSTOM_DATA = ' + JSON.stringify({students:BASE.students,violations:BASE.violations}).replace(/</g,'\\u003c') + ';');
+  const blob = new Blob(['<!doctype html>\n' + replaced], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  a.download = `10A4_diem_danh_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.html`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  alert('Đã lưu trạng thái vào file HTML mới.');
+}
+
+window.addEventListener('load',()=>{renderStudents();renderViolations();});
+</script>
+</body></html>
